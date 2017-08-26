@@ -1,0 +1,13 @@
+{
+  "name": "pup-alert-device",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/KevinDyer/pup-alert-device",
+  "author": "Kevin Dyer <kevin.m.dyer@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "firebase": "^4.3.0",
+    "winston": "^2.3.1"
+  }
+}
