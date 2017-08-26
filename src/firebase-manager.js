@@ -33,8 +33,7 @@ class FirebaseManager extends EventEmitter {
   load() {
     logger.debug('Loading firebase manager');
     return Promise.resolve()
-    .then(() => this._signIn())
-    .then(() => this.setTemperature(24.6));
+    .then(() => this._signIn());
   }
 
   _signIn() {
