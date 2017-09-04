@@ -16,6 +16,7 @@ class ConfigManager {
       .version(packageInfo.version)
       .option('-e, --email <email>', 'The device email (provisioned by an admin).')
       .option('-p, --password <password>', 'The device password (provisioned by an admin).')
+      .option('-v, --verbose', 'Log debug information.')
       .parse(process.argv);
     if (commander.email) {
       logger.debug('Email: %s', commander.email);
