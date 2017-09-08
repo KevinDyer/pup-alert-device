@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const five = require('johnny-five');
+const logger = require('./logger');
 
 class TemperatureManager extends EventEmitter {
   constructor() {
