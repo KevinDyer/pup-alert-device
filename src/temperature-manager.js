@@ -13,12 +13,14 @@ class TemperatureManager extends EventEmitter {
     this._thermometer.disable();
   }
 
-  _onChange(...data) {
-    console.log(require('util').inspect(data, {colors: true, depth: 1}));
+  _onChange(event) {
+    console.log(`[${Date.now()}]: Change`);
+    console.log(require('util').inspect(event, {colors: true, depth: 1}));
   }
 
-  _onData(...data) {
-    console.log(require('util').inspect(data, {colors: true, depth: 1}));
+  _onData(event) {
+    console.log(`[${Date.now()}]: Data`);
+    console.log(require('util').inspect(event, {colors: true, depth: 1}));
   }
 
   load() {

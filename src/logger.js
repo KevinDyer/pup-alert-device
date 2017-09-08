@@ -1,10 +1,7 @@
 const winston = require('winston');
 
-
 const isVerbose = process.argv.some((arg) => '--verbose' === arg || '-v' === arg);
 const level = (isVerbose ? 'debug' : 'info');
-console.log(`isVerbose: ${isVerbose}`);
-console.log(`level: ${level}`);
 
 const consoleOptions = {
   colorize: true,
