@@ -7,7 +7,7 @@ const consoleOptions = {
   colorize: true,
   timestamp: true,
   prettyPrint: true,
-  depth: 2
+  depth: 2,
 };
 
 const fileOptions = {
@@ -17,7 +17,7 @@ const fileOptions = {
   maxsize: 4 * 1024 * 1024,
   maxFiles: 10,
   prettyPrint: true,
-  depth: null 
+  depth: null,
 };
 
 const logger = new winston.Logger({
@@ -25,7 +25,7 @@ const logger = new winston.Logger({
   transports: [
     new winston.transports.Console(consoleOptions),
     new winston.transports.File(fileOptions),
-  ]
+  ],
 });
 
 module.exports = logger;

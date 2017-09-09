@@ -1,19 +1,23 @@
-const ConfigManager = require('./config-manager');
-const FirebaseManager = require('./firebase-manager');
-const TemperatureManager = require('./temperature-manager');
+(() => {
+  'use strict';
 
-const configManager = new ConfigManager();
-const firebaseManager = new FirebaseManager(configManager);
-const temperatureManager = new TemperatureManager();
+  const ConfigManager = require('./config-manager');
+  const FirebaseManager = require('./firebase-manager');
+  const TemperatureManager = require('./temperature-manager');
 
-temperatureManager.on('temp', (event) => {
-  if (firebaseManager.isSignedIn()) {
-    firebaseManager.setTemperature(event.C);
-  }
-});
+  const configManager = new ConfigManager();
+  const firebaseManager = new FirebaseManager(configManager);
+  const temperatureManager = new TemperatureManager();
 
-Promise.resolve()
-.then(() => configManager.load())
-.then(() => firebaseManager.load())
-.then(() => temperatureManager.load())
-.catch((err) => console.log(err.message));
+  temperatureManager.on('temp', (event) => {
+    if (firebaseManager.isSignedIn()) {
+      firebaseManager.setTemperature(event.C);
+    }
+  });
+
+  Promise.resolve()
+  .then(() => configManager.load())
+  .then(() => firebaseManager.load())
+  .then(() => temperatureManager.load())
+  .catch((err) => console.log(err.message));
+})();
