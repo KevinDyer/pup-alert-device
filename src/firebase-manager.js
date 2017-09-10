@@ -23,11 +23,24 @@
       this._auth.onAuthStateChanged((user) => {
         if (user) {
           logger.info('Device signed in.', {uid: user.uid});
+
+          const deviceRef = firebase.database().ref(`devices/${user.uid}`);
+
+          const isOnlineRef = deviceRef.child('isOnline');
+          isOnlineRef.onDisconnect().set(false);
+          isOnlineRef.set(true);
+
+          const lastOnlineRef = deviceRef.child('lastOnline');
+          lastOnlineRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+
           this._user = user;
+
           this.emit('signedIn', user);
         } else {
           logger.info('Device signed out.');
+
           this._user = null;
+
           this.emit('signedOut');
         }
       });
