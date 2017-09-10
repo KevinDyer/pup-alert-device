@@ -2,8 +2,8 @@
   'use strict';
 
   const EventEmitter = require('events');
-  const five = require('johnny-five');
   const Raspi = require('raspi-io');
+  const five = require('johnny-five');
 
   class DeviceManager extends EventEmitter {
     constructor() {
@@ -36,11 +36,11 @@
         this._connectedLed = new five.Led('P1-7');
         this._connectedLed.on();
 
-        this._dataLed = new five.Led('P1-31');
-        this._dataLed.on();
-
         this._temperatureLed = new five.Led('P1-29');
         this._temperatureLed.on();
+
+        this._dataLed = new five.Led('P1-31');
+        this._dataLed.on();
 
         this._thermometer = new five.Thermometer({
           controller: 'TMP102',
@@ -49,46 +49,30 @@
         this._thermometer.on('data', this._onTempData.bind(this));
         this._thermometer.disable();
       })
-      .then(() => {
-        return new Promise((resolve) => {
-          let count = 0;
-          this._connectedLed.blink(300, () => {
-            count++;
-            if (5 < count) {
-              this._connectedLed.stop();
-              this._connectedLed.off();
-              resolve();
-            }
-          });
-        });
-      })
-      .then(() => {
-        return new Promise((resolve) => {
-          let count = 0;
-          this._temperatureLed.blink(300, () => {
-            count++;
-            if (5 < count) {
-              this._temperatureLed.stop();
-              this._temperatureLed.off();
-              resolve();
-            }
-          });
-        });
-      })
-      .then(() => this._thermometer.enable())
-      .then(() => {
-        return new Promise((resolve) => {
-          let count = 0;
-          this._dataLed.blink(300, () => {
-            count++;
-            if (5 < count) {
-              this._dataLed.stop();
-              this._dataLed.off();
-              resolve();
-            }
-          });
+      .then(() => this._blinkLed(this._connectedLed, 3))
+      .then(() => this._connectedLed.off())
+      .then(() => this._blinkLed(this._temperatureLed, 3))
+      .then(() => this._temperatureLed.off())
+      .then(() => this._blinkLed(this._dataLed, 3))
+      .then(() => this._dataLed.off())
+      .then(() => this._thermometer.enable());
+    }
+
+    _blinkLed(led, numOfBlinks) {
+      return new Promise((resolve) => {
+        let count = 0;
+        led.blink(100, () => {
+          count++;
+          if (numOfBlinks < count) {
+            led.stop();
+            resolve();
+          }
         });
       });
+    }
+
+    getConnectedLed() {
+      return this._connectedLed;
     }
 
     getDataLed() {

@@ -47,7 +47,7 @@
 
         this._user = user;
 
-        this.emit('signedIn', user);
+        this.emit('signedIn', true);
       } else {
         logger.info('Device signed out.');
 
@@ -55,7 +55,7 @@
 
         this._temperatureRef = null;
 
-        this.emit('signedOut');
+        this.emit('signedIn', false);
       }
     }
 
