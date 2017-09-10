@@ -37,6 +37,7 @@
         this._dataLed = new five.Led('P1-31');
         this._thermometer = new five.Thermometer({controller: 'TMP102'});
         this._thermometer.on('data', this._onTempData.bind(this));
+        this._thermometer.disable();
 
         this._board.once('exit', () => {
           this._connectedLed.off();
@@ -84,6 +85,14 @@
           }
         });
       });
+    }
+
+    hasTemperature() {
+       return null !== this._lastTemp;
+    }
+
+    getTemperature() {
+       return this._lastTemp;
     }
 
     getConnectedLed() {

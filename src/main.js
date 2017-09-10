@@ -19,14 +19,15 @@
     };
   }
 
-  deviceManager.on('temp', (temp) => {
-    const temperatureLed = deviceManager.getTemperatureLed();
+  const onTemp = debounce((temp) => {
     if (firebaseManager.isSignedIn()) {
       firebaseManager.setTemperature(temp);
       let count = 0;
+      const temperatureLed = deviceManager.getTemperatureLed();
+      temperatureLed.off();
       temperatureLed.strobe(100, () => {
         count++;
-        if (3 < count) {
+        if (5 < count) {
           temperatureLed.stop();
           temperatureLed.off();
         }
@@ -34,21 +35,26 @@
     } else {
       const dataLed = deviceManager.getDataLed();
       let count = 0;
-      temperatureLed.on();
-      dataLed.strobe(300, () => {
+      dataLed.off();
+      dataLed.strobe(100, () => {
         count++;
-        if (6 < count) {
+        if (5 < count) {
           dataLed.stop();
           dataLed.off();
-          temperatureLed.off();
         }
       });
     }
-  });
+  }, 1000);
+
+  deviceManager.on('temp', onTemp);
 
   const onSignedIn = debounce((isSignedIn) => {
     const connectedLed = deviceManager.getConnectedLed();
     if (isSignedIn) {
+      if (deviceManager.hasTemperature()) {
+        const lastTemp = deviceManager.getTemperature();
+        onTemp(lastTemp);
+      }
       connectedLed.off();
     } else {
       connectedLed.on();
