@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
+  const EventEmitter = require('events');
   const firebase = require('firebase');
   const logger = require('./logger');
-  const EventEmitter = require('events');
 
   // Initialize Firebase
   const config = {

@@ -19,17 +19,28 @@
     };
   }
 
-  deviceManager.on('temp', (event) => {
+  deviceManager.on('temp', (temp) => {
+    const temperatureLed = deviceManager.getTemperatureLed();
     if (firebaseManager.isSignedIn()) {
-      firebaseManager.setTemperature(event.C);
+      firebaseManager.setTemperature(temp);
+      let count = 0;
+      temperatureLed.strobe(100, () => {
+        count++;
+        if (3 < count) {
+          temperatureLed.stop();
+          temperatureLed.off();
+        }
+      });
     } else {
       const dataLed = deviceManager.getDataLed();
       let count = 0;
+      temperatureLed.on();
       dataLed.strobe(300, () => {
         count++;
         if (6 < count) {
           dataLed.stop();
           dataLed.off();
+          temperatureLed.off();
         }
       });
     }
@@ -37,10 +48,15 @@
 
   const onSignedIn = debounce((isSignedIn) => {
     const connectedLed = deviceManager.getConnectedLed();
+    if (isSignedIn) {
+      connectedLed.off();
+    } else {
+      connectedLed.on();
+    }
     let count = 0;
-    connectedLed.strobe(300, () => {
+    connectedLed.strobe(100, () => {
       count++;
-      if (6 < count) {
+      if (4 < count) {
         connectedLed.stop();
         if (isSignedIn) {
           connectedLed.on();

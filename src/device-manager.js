@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  const MAX_TEMP_THRESHOLD = 0.5;
+
   const EventEmitter = require('events');
   const Raspi = require('raspi-io');
   const five = require('johnny-five');
@@ -17,10 +19,7 @@
       this._dataLed = null;
       this._temperatureLed = null;
       this._thermometer = null;
-    }
-
-    _onTempData(event) {
-      this.emit('temp', event);
+      this._lastTemp = null;
     }
 
     load() {
@@ -34,34 +33,50 @@
       })
       .then(() => {
         this._connectedLed = new five.Led('P1-7');
-        this._connectedLed.on();
-
         this._temperatureLed = new five.Led('P1-29');
-        this._temperatureLed.on();
-
         this._dataLed = new five.Led('P1-31');
-        this._dataLed.on();
-
-        this._thermometer = new five.Thermometer({
-          controller: 'TMP102',
-          freq: 10 * 1000,
-        });
+        this._thermometer = new five.Thermometer({controller: 'TMP102'});
         this._thermometer.on('data', this._onTempData.bind(this));
-        this._thermometer.disable();
+
+        this._board.once('exit', () => {
+          this._connectedLed.off();
+          this._temperatureLed.off();
+          this._dataLed.off();
+          this._thermometer.disable();
+        });
       })
-      .then(() => this._blinkLed(this._connectedLed, 3))
+      .then(() => this._blinkLed({led: this._connectedLed}))
       .then(() => this._connectedLed.off())
-      .then(() => this._blinkLed(this._temperatureLed, 3))
+      .then(() => this._blinkLed({led: this._temperatureLed}))
       .then(() => this._temperatureLed.off())
-      .then(() => this._blinkLed(this._dataLed, 3))
+      .then(() => this._blinkLed({led: this._dataLed}))
       .then(() => this._dataLed.off())
       .then(() => this._thermometer.enable());
     }
 
-    _blinkLed(led, numOfBlinks) {
+    _onTempData(event) {
+      const temp = event.C;
+      if (this._isTempChanged(temp)) {
+        this._lastTemp = temp;
+        this.emit('temp', this._lastTemp);
+      }
+    }
+
+    _isTempChanged(temp) {
+      if (null === this._lastTemp) {
+          return true;
+      }
+      const diff = Math.abs(this._lastTemp - temp);
+      if (diff > MAX_TEMP_THRESHOLD) {
+        return true;
+      }
+      return false;
+    }
+
+    _blinkLed({led, numOfBlinks=3, ms}={}) {
       return new Promise((resolve) => {
         let count = 0;
-        led.blink(100, () => {
+        led.blink(ms, () => {
           count++;
           if (numOfBlinks < count) {
             led.stop();
@@ -73,6 +88,10 @@
 
     getConnectedLed() {
       return this._connectedLed;
+    }
+
+    getTemperatureLed() {
+      return this._temperatureLed;
     }
 
     getDataLed() {
