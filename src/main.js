@@ -3,21 +3,31 @@
 
   const ConfigManager = require('./config-manager');
   const FirebaseManager = require('./firebase-manager');
-  const TemperatureManager = require('./temperature-manager');
+  const DeviceManager = require('./device-manager');
 
   const configManager = new ConfigManager();
   const firebaseManager = new FirebaseManager(configManager);
-  const temperatureManager = new TemperatureManager();
+  const deviceManager = new DeviceManager();
 
-  temperatureManager.on('temp', (event) => {
+  deviceManager.on('temp', (event) => {
     if (firebaseManager.isSignedIn()) {
       firebaseManager.setTemperature(event.C);
+    } else {
+      const dataLed = device.getDataLed();
+      let count = 0;
+      dataLed.strobe(300, () => {
+        if (5 < count) {
+          dataLed.stop();
+          dataLed.off();
+        }
+        count++;
+      });
     }
   });
 
   Promise.resolve()
   .then(() => configManager.load())
   .then(() => firebaseManager.load())
-  .then(() => temperatureManager.load())
+  .then(() => deviceManager.load())
   .catch((err) => console.log(err.message));
 })();
